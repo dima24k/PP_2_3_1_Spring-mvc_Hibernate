@@ -26,9 +26,7 @@ public class User {
         this.email = email;
     }
 
-    public User() {
-
-    }
+    public User() {}
 
     public void setId(Long id) {
         this.id = id;
