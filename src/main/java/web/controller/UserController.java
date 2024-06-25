@@ -3,10 +3,7 @@ package web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import web.model.User;
 import web.service.UserService;
 
@@ -29,7 +26,7 @@ public class UserController {
 
     @GetMapping("/new")
     public String newUser(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new User() );
         return "new";
     }
 
@@ -40,13 +37,14 @@ public class UserController {
     }
 
     @GetMapping("/update")
-    public String updateUserGet(@ModelAttribute("user") User user) {
+    public String updateUserGet(@RequestParam(value = "id", required = false) Long id, Model model) {
+        model.addAttribute("user", userService.getUser(id) );
         return "update";
     }
 
     @PostMapping("/update")
-    public String updateUserPost(@ModelAttribute("user") User user) {
-        userService.updateUser(user);
+    public String updateUserPost(@RequestParam(value="id", required = false) Long id, @ModelAttribute User user) {
+        userService.updateUser(user, id);
         return "redirect:/users/all";
     }
 }

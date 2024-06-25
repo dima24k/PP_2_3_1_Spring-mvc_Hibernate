@@ -5,6 +5,7 @@
     <title>New User</title>
 </head>
 <body>
+<h3> LIST OF USERS </h3>
 <form th:method="POST" th:action="@{/users/new}" th:object="${user}">
     <label for="name">Enter name: </label>
     <input type="text" th:field="*{name}" id="name"/>

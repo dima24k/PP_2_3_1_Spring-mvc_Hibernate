@@ -15,7 +15,7 @@
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <thymeleaf-spring5>3.0.14.RELEASE</thymeleaf-spring5>
         <hibernate-core>5.6.3.Final</hibernate-core>
-        <mysql-connector-java>8.0.25</mysql-connector-java>
+        <mysql-connector-java>8.0.28</mysql-connector-java>
         <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
     </properties>
 
