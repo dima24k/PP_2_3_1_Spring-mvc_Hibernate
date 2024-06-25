@@ -18,6 +18,12 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/user")
+    public String getUser(@RequestParam(name = "id") Long id, Model model) {
+        model.addAttribute("user", userService.getUser(id) );
+        return "show";
+    }
+
     @GetMapping("/all")
     public String getAllUsers(Model model) {
         model.addAttribute("users", userService.getAll() );
@@ -37,14 +43,26 @@ public class UserController {
     }
 
     @GetMapping("/update")
-    public String updateUserGet(@RequestParam(value = "id", required = false) Long id, Model model) {
+    public String updateUserGet(@RequestParam(value = "id") Long id, Model model) {
         model.addAttribute("user", userService.getUser(id) );
         return "update";
     }
 
     @PostMapping("/update")
-    public String updateUserPost(@RequestParam(value="id", required = false) Long id, @ModelAttribute User user) {
+    public String updateUserPost(@RequestParam(value="id") Long id, @ModelAttribute User user) {
         userService.updateUser(user, id);
+        return "redirect:/users/all";
+    }
+
+    @GetMapping("/delete")
+    public String deleteUserGet(@RequestParam(value = "id") Long id, Model model) {
+        model.addAttribute("id", id);
+        return "delete";
+    }
+
+    @PostMapping("/delete")
+    public String deleteUserPost(@RequestParam(value="id") Long id) {
+        userService.deleteUser(id);
         return "redirect:/users/all";
     }
 }
