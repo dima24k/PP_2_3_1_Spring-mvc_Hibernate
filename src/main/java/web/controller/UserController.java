@@ -28,15 +28,25 @@ public class UserController {
     }
 
     @GetMapping("/new")
-    public String newUser(@ModelAttribute("user") User user) {
+    public String newUser(Model model) {
+        model.addAttribute("user", new User());
         return "new";
     }
 
-    @PostMapping
+    @PostMapping("/new")
     public String createUser(@ModelAttribute("user") User user) {
         userService.newUser(user);
-        return "redirect:/users";
+        return "redirect:/users/all";
     }
 
+    @GetMapping("/update")
+    public String updateUserGet(@ModelAttribute("user") User user) {
+        return "update";
+    }
 
+    @PostMapping("/update")
+    public String updateUserPost(@ModelAttribute("user") User user) {
+        userService.updateUser(user);
+        return "redirect:/users/all";
+    }
 }

@@ -13,20 +13,17 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
-
 @Configuration
-@PropertySource("classpath:db.properties")
-@PropertySource("classpath:hibernate.properties")
+@PropertySource({"classpath:db.properties", "classpath:hibernate.properties"})
 @EnableTransactionManagement
 @ComponentScan(value = "web")
 public class AppConfig {
 
-    private Environment env;
+    private final Environment env;
 
     @Autowired
     public AppConfig(Environment env) {
@@ -34,49 +31,39 @@ public class AppConfig {
     }
 
     @Bean
-    public DataSource getDataSource() {
-        BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setDriverClassName(env.getProperty("db.driver"));
-        basicDataSource.setUrl(env.getProperty("db.url"));
-        basicDataSource.setUsername(env.getProperty("db.username"));
-        basicDataSource.setPassword(env.getProperty("db.password"));
-        return basicDataSource;
+    public DataSource dataSource() {
+        BasicDataSource ds = new BasicDataSource();
+        ds.setUrl(env.getRequiredProperty("db.url"));
+        ds.setDriverClassName(env.getRequiredProperty("db.driver"));
+        ds.setUsername(env.getRequiredProperty("db.username"));
+        ds.setPassword(env.getRequiredProperty("db.password"));
+        return ds;
     }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(getDataSource() );
-        em.setPackagesToScan("web.model");
-        em.setJpaVendorAdapter(new HibernateJpaVendorAdapter() );
-        em.setJpaProperties(getHibernateProperties() );
+        em.setDataSource(dataSource() );
+        em.setPackagesToScan("web/model");
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(vendorAdapter);
+        em.setJpaProperties(additionalProperties() );
         return em;
     }
 
-    public Properties getHibernateProperties() {
-        try {
-            Properties properties = new Properties();
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("hibernate.properties");
-            properties.load(inputStream);
-            return properties;
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Can't find 'hibernate.properties' in classpath!", e);
-        }
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
+        return transactionManager;
     }
 
     @Bean
-    public PlatformTransactionManager platformTransactionManager() {
-        JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-        jpaTransactionManager.setEntityManagerFactory(entityManagerFactoryBean().getObject() );
-        return jpaTransactionManager;
-    }
-
-    Properties additionalProperties() {
+    public Properties additionalProperties() {
         Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto") );
+        properties.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
         properties.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
-        properties.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect") );
-
+        properties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         return properties;
     }
 }
