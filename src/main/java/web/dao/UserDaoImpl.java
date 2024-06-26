@@ -8,7 +8,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
-public class UserDaoImpl implements UserDao{
+public class UserDaoImpl implements UserDao {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -40,7 +40,7 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public void deleteUser(Long id) {
-        User user = entityManager.find(User.class, id);
+        User user = entityManager.getReference(User.class, id);
         entityManager.remove(user);
     }
 }
